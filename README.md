@@ -27,6 +27,17 @@ curl http://localhost:8080/health
 
 To run both in containers instead: `make up`.
 
+### Emails
+
+The API sends emails through SMTP when `SMTP_ADDR` is set, otherwise it only logs them. [Mailcatcher](https://mailcatcher.me) catches them in development:
+
+```bash
+make mail                              # Mailcatcher: SMTP on :1025, UI on http://localhost:1080
+SMTP_ADDR=localhost:1025 make dev-api  # the API sends to it
+```
+
+`make up` starts Mailcatcher too and points the API at it.
+
 ## Commands
 
 | Command        | What it does                                                        |
@@ -36,7 +47,8 @@ To run both in containers instead: `make up`.
 | `make lint`    | Format, lint and type checks of both apps                           |
 | `make build`   | API binary and frontend build                                       |
 | `make check`   | Everything CI runs: docs budget, lint, tests, builds                |
-| `make up`      | Both apps in Docker Compose                                         |
+| `make up`      | Both apps and Mailcatcher in Docker Compose                         |
+| `make mail`    | Mailcatcher alone, UI on http://localhost:1080                      |
 | `make help`    | Every target                                                        |
 
 ## Layout

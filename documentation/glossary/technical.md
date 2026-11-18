@@ -57,8 +57,9 @@ module's `AGENTS.md` or to the code. An entry stands alone: no reference to a sp
   implementation delivers either synchronously or asynchronously.
 - **Event collector** — a test helper subscribed to an event bus that records the events it
   receives, so a test can assert on what a command emitted.
-- **Mailer** — the port for sending an email. The fake mailer logs instead of sending; the mailer
-  spy records the emails for a test to assert on.
+- **Mailer** — the port for sending an email. The SMTP mailer sends through an SMTP server
+  (Mailcatcher in development); the fake mailer logs instead; the mailer spy records the emails for
+  a test to assert on.
 
 ## Frontend
 

@@ -1,0 +1,98 @@
+package mailer_test
+
+import (
+	"bufio"
+	"net"
+	"strings"
+	"testing"
+
+	"ddd-second-hand-marketplace/pkg/mailer"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+// smtpServer is a minimal SMTP server that answers every command and
+// sends the DATA section of the first message on its channel.
+func smtpServer(t *testing.T) (string, <-chan string) {
+	t.Helper()
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	require.NoError(t, err)
+	t.Cleanup(func() { ln.Close() })
+
+	received := make(chan string, 1)
+	go func() {
+		conn, err := ln.Accept()
+		if err != nil {
+			return
+		}
+		defer conn.Close()
+		r := bufio.NewReader(conn)
+		reply := func(s string) { conn.Write([]byte(s + "\r\n")) }
+
+		reply("220 localhost ready")
+		for {
+			line, err := r.ReadString('\n')
+			if err != nil {
+				return
+			}
+			switch cmd := strings.ToUpper(strings.TrimSpace(line)); {
+			case strings.HasPrefix(cmd, "EHLO"), strings.HasPrefix(cmd, "HELO"):
+				reply("250 localhost")
+			case cmd == "DATA":
+				reply("354 end with <CRLF>.<CRLF>")
+				var data strings.Builder
+				for {
+					l, err := r.ReadString('\n')
+					if err != nil || l == ".\r\n" {
+						break
+					}
+					data.WriteString(l)
+				}
+				received <- data.String()
+				reply("250 OK")
+			case cmd == "QUIT":
+				reply("221 bye")
+				return
+			default:
+				reply("250 OK")
+			}
+		}
+	}()
+	return ln.Addr().String(), received
+}
+
+func TestSMTPMailer_SendSimpleEmail(t *testing.T) {
+	addr, received := smtpServer(t)
+
+	err := mailer.NewSMTPMailer(addr).SendSimpleEmail("bob@example.com", "shop@example.com", "Hello", "Your ad is online")
+
+	require.NoError(t, err)
+	msg := <-received
+	assert.Contains(t, msg, "From: shop@example.com")
+	assert.Contains(t, msg, "To: bob@example.com")
+	assert.Contains(t, msg, "Subject: Hello")
+	assert.Contains(t, msg, "Your ad is online")
+}
+
+func TestSMTPMailer_SendTemplatedEmail(t *testing.T) {
+	addr, received := smtpServer(t)
+
+	err := mailer.NewSMTPMailer(addr).SendTemplatedEmail("bob@example.com", "shop@example.com", "ad-published", map[string]any{"title": "Bike"})
+
+	require.NoError(t, err)
+	msg := <-received
+	assert.Contains(t, msg, "Subject: ad-published")
+	assert.Contains(t, msg, `"title": "Bike"`)
+}
+
+func TestSMTPMailer_FailsWhenServerIsUnreachable(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	require.NoError(t, err)
+	addr := ln.Addr().String()
+	ln.Close()
+
+	err = mailer.NewSMTPMailer(addr).SendSimpleEmail("bob@example.com", "shop@example.com", "Hello", "body")
+
+	assert.Error(t, err)
+}

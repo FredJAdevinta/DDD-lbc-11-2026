@@ -11,6 +11,7 @@ Shared terms: [`domain.md`](../../documentation/glossary/domain.md), [`technical
 - `cmd/api/main.go` — the composition root: builds the adapters, the use cases, registers routes and consumers.
 - `internal/<bounded-context>/` — `domain/`, `application/{command,query}/`, `adapter/{driven,driving}/`, and its own `AGENTS.md`.
 - `pkg/eventbus/`, `pkg/mailer/` — shared infrastructure, each with its test helper under `testing/`.
+- Mailer: `main.go` builds the SMTP mailer when `SMTP_ADDR` is set (Mailcatcher, `make mail`, UI on :1080), the fake mailer otherwise. Tests use the mailer spy, never SMTP.
 
 Patterns, naming and the step-by-step workflow are in the `tactical-ddd` skill: **invoke it before implementing or refactoring**. A new bounded context starts with the `scaffold-bc` skill.
 
