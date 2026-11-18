@@ -4,7 +4,7 @@ WEB := apps/web
 
 .DEFAULT_GOAL := help
 .PHONY: help install dev dev-api dev-web test test-api test-web lint lint-api lint-web \
-        build build-api build-web docs-budget check up down
+        build build-api build-web docs-budget check up down mail
 
 help: ## List the targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  %-12s %s\n", $$1, $$2}'
@@ -16,7 +16,7 @@ install: ## Download the API modules and the frontend dependencies
 dev: ## Run the API (:8080) and the frontend (:3000) together
 	@$(MAKE) -j2 dev-api dev-web
 
-dev-api: ## Run the API on :8080
+dev-api: ## Run the API on :8080 (set SMTP_ADDR=localhost:1025 to send emails to Mailcatcher)
 	cd $(API) && go run ./cmd/api
 
 dev-web: ## Run the frontend on :3000
@@ -56,6 +56,9 @@ check: docs-budget lint test build ## Everything CI runs
 
 up: ## Run both apps in Docker Compose
 	docker compose up --build
+
+mail: ## Run Mailcatcher alone: SMTP on :1025, web UI on http://localhost:1080
+	docker compose up -d mailcatcher
 
 down: ## Stop Docker Compose
 	docker compose down
