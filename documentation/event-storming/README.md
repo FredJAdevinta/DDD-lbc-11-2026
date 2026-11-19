@@ -1,8 +1,8 @@
 # Event storming
 
 Transcription du mur de l'atelier (18 et 19 novembre 2026), parcours par parcours. Les photos
-d'origine sont à côté : [`mur-1-gauche.jpg`](mur-1-gauche.jpg), [`mur-2-droite.jpg`](mur-2-droite.jpg),
-[`mur-3-agregats.jpg`](mur-3-agregats.jpg).
+d'origine sont à côté : [`mur-1-gauche.jpg`](images/mur-1-gauche.jpg), [`mur-2-droite.jpg`](images/mur-2-droite.jpg),
+[`mur-3-agregats.jpg`](images/mur-3-agregats.jpg).
 
 **Ce fichier est une trace d'atelier, pas le modèle.** Le texte des post-its est recopié, sauf là où le groupe a précisé un terme depuis.
 Le vocabulaire qui fait foi est celui de [`domain.md`](../glossary/domain.md) : un terme n'y entre
@@ -324,14 +324,3 @@ Posées sur le mur (post-its gris) :
   Historique d'annonce.
 - **« ? »** au-dessus de l'Acheteur (parcours 3) : question non notée.
 - **« ? »** sous Annonce supprimée (parcours 5) : question non notée.
-
-Relevées à la transcription :
-
-1. **Validée et activée** — toute annonce validée est-elle activée, ou y a-t-il des cas où non ?
-2. **Désactivée** — après un re-signalement (4) et après une suppression (5) : même état ?
-3. **Re-signalée** — à partir de combien de signalements ?
-4. **Mise en ligne** (6) — est-ce « Annonce activée » ?
-5. **Relance à 7 jours** (3) — le post-it dit « form d'achat (?) soumis » : s'agit-il du formulaire
-   de contact ?
-6. **Délateur** — un acheteur, un visiteur, n'importe qui ?
-7. **Service client contacté** — dans quel sous-domaine, déclenché par quoi ?

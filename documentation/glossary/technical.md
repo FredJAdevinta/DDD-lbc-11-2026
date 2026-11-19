@@ -81,9 +81,6 @@ module's `AGENTS.md` or to the code. An entry stands alone: no reference to a sp
 
 - **Docs budget** — the size limit on agent docs: 16 KiB per `AGENTS.md`, 20 KiB per glossary, 300
   characters per glossary entry. Checked after an agent's edit, by `make check` and in CI.
-- **Event storming** — the workshop where the team laid the domain out as events, commands, actors,
-  views and aggregates. Its wall is transcribed as one diagram per journey under
-  `documentation/event-storming/`: the source of the domain vocabulary, not a backlog.
 - **Spec** — a Markdown file under `documentation/specs/` describing one feature from the user's
   side, written by the `to-spec` skill.
 - **Ticket** — a Markdown file under `documentation/tickets/` describing one vertical slice of a
