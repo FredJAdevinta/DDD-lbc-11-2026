@@ -1,7 +1,7 @@
 # Event storming
 
 Transcription du mur de l'atelier (18 et 19 novembre 2026), parcours par parcours. Les photos
-d'origine sont à côté : [`mur-1-gauche.jpg`](images/mur-1-gauche.jpg), [`mur-2-droite.jpg`](images/mur-2-droite.jpg),
+d'origine sont dans `images/` : [`mur-1-gauche.jpg`](images/mur-1-gauche.jpg), [`mur-2-droite.jpg`](images/mur-2-droite.jpg),
 [`mur-3-agregats.jpg`](images/mur-3-agregats.jpg).
 
 **Ce fichier est une trace d'atelier, pas le modèle.** Le texte des post-its est recopié, sauf là où le groupe a précisé un terme depuis.
@@ -318,7 +318,7 @@ Ce que l'atelier a noté sur les post-its jaune foncé. C'est une réflexion en 
 
 ## Questions
 
-Posées sur le mur (post-its gris) :
+Les post-its gris du mur :
 
 - **Deux agrégats ou un ? Date de lock / verrouillage** — sur File d'attente modération et
   Historique d'annonce.
