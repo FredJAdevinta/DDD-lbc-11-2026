@@ -31,6 +31,9 @@ make up        # the same two services in Docker Compose
 
 The two glossaries are loaded with this file and are the only ones: [`technical.md`](documentation/glossary/technical.md) (architecture) and [`domain.md`](documentation/glossary/domain.md) (business). There is no `CONTEXT.md`: a skill that asks for one means `domain.md`.
 
+@documentation/glossary/technical.md
+@documentation/glossary/domain.md
+
 - Use the glossaries' names, spelled as in the code.
 - Add a missing term to its glossary in the same change as the code that uses it; never invent one in code. Each glossary's header says how an entry is written.
 

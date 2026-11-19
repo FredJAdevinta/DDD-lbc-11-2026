@@ -46,7 +46,7 @@ project-root/
 │           └── mailer_spy.go
 ├── go.mod
 ├── go.sum
-└── CLAUDE.md                   # Project documentation
+└── AGENTS.md                   # Agent docs of the API
 ```
 
 > **Note**: Each module represents a **subdomain** (problem space) implemented as a **bounded context** (solution space). Subdomains are business segments (Core, Supporting, Generic), while bounded contexts are the technical boundaries where a ubiquitous language applies. In this project, there's a 1:1 mapping between them.

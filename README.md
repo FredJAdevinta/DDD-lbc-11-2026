@@ -100,7 +100,7 @@ Today only `/health` exists, answered directly in `main.go`; the `classified-ad`
 
 ## Working with the agent
 
-`AGENTS.md` is the entry point for coding agents; `CLAUDE.md` loads it together with the two glossaries. The usual path for a feature:
+`AGENTS.md` is the entry point for coding agents; Claude Code reads it natively and it imports the two glossaries. The usual path for a feature:
 
 1. `/grill-with-docs` — challenge the idea and settle its vocabulary in the domain glossary
 2. `/to-spec` — write the spec to `documentation/specs/`
