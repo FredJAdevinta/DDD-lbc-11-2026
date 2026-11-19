@@ -8,7 +8,7 @@ This skill takes the current conversation context and codebase understanding and
 
 This project has no issue tracker: a spec is a Markdown file under `documentation/specs/`.
 
-**Write the spec in French**, the language the team models in: the body and the section headings of the template, translated. Domain terms are those of `documentation/glossary/domain.md`; technical terms (`aggregate`, `command`, `gateway`…) keep their English name from `technical.md`. The file slug is French, without accents.
+**Write the spec in French**, the language the team models in: the body and the section headings of the template, translated. Domain terms are those of `documentation/glossary/domain.md`; technical terms (`aggregate`, `command`, `gateway`…) keep their English name from `technical.md`. The file slug is French, without accents. When the feature is a journey of the event storming (`documentation/event-storming/README.md`), read that journey and name it in the spec.
 
 ## Process
 

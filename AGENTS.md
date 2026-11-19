@@ -41,7 +41,7 @@ The two glossaries are loaded with this file and are the only ones: [`technical.
 
 The team models in French, so the business vocabulary stays in French everywhere, code included. Never translate a domain term into English.
 
-- **French, from `domain.md`**: every name that carries a business concept (aggregates, value objects, commands, events, domain errors, their fields and methods, the bounded context folder, JSON keys, URL segments, frontend features), plus `domain.md` itself, the specs, the tickets and every text shown to a user.
+- **French, from `domain.md`**: every name that carries a business concept (aggregates, value objects, commands, events, domain errors, their fields and methods, the bounded context folder, JSON keys, URL segments, frontend features), plus `domain.md` itself, the specs, the tickets, the event storming and every text shown to a user.
 - **English**: the pattern words around those names (`New…`, `Err…`, `…Command`, `…Event`, `…Repository`, `…View`, `…Handler`, `…Gateway`), everything technical, comments, test descriptions, commit messages, `technical.md`, every `AGENTS.md` and the skills.
 - **ASCII in code**: drop accents, cedillas and apostrophes in identifiers, file names, URLs, JSON keys and event types. Keep them in prose and in user-facing text.
 
@@ -65,7 +65,7 @@ The team models in French, so the business vocabulary stays in French everywhere
 
 ## Working on a feature
 
-1. `/grill-with-docs` — challenge the idea and settle its vocabulary in `domain.md`.
+1. `/grill-with-docs` — challenge the idea against its journey in the event storming and settle its vocabulary in `domain.md`.
 2. `/to-spec` — write the spec to `documentation/specs/`.
 3. `/to-tickets` — split it into vertical slices under `documentation/tickets/`.
 4. Implement one ticket at a time with `tactical-ddd` and `frontend-development`, tests first.
@@ -84,4 +84,5 @@ The team models in French, so the business vocabulary stays in French everywhere
 - [`apps/api/AGENTS.md`](apps/api/AGENTS.md) — API layout, commands and rules
 - [`apps/web/AGENTS.md`](apps/web/AGENTS.md) — frontend layout, commands and rules
 - [`documentation/`](documentation/) — glossaries, specs, tickets
+- [`documentation/event-storming/`](documentation/event-storming/README.md) — the workshop wall as one diagram per journey, with the subdomains, aggregates and open questions. It models the whole domain: read the journey you work on, implement only what a ticket asks.
 - [`prompts/`](prompts/) — the prompts worth keeping, one file each
