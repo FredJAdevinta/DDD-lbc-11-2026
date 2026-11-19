@@ -11,9 +11,6 @@ import (
 )
 
 func main() {
-	mail := newMailer()
-	_ = mail // inject it into the use cases that send emails
-
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
@@ -25,7 +22,8 @@ func main() {
 }
 
 // newMailer sends through the SMTP server at SMTP_ADDR (Mailcatcher in
-// development), or falls back to the fake mailer that only logs.
+// development), or falls back to the fake mailer that only logs. No use case
+// sends an email yet: call it in main to inject the first one that does.
 func newMailer() mailer.Mailer {
 	addr := os.Getenv("SMTP_ADDR")
 	if addr == "" {

@@ -3,6 +3,8 @@ package mailer
 import (
 	"encoding/json"
 	"fmt"
+	"mime"
+	"net/mail"
 	"net/smtp"
 	"strings"
 )
@@ -18,19 +20,30 @@ func NewSMTPMailer(addr string) *SMTPMailer {
 	return &SMTPMailer{addr: addr}
 }
 
-// SendSimpleEmail sends a plain-text email.
+// SendSimpleEmail sends a plain-text email. It refuses a line break in a
+// header, which would let the caller inject headers such as Bcc, and encodes
+// a non-ASCII subject so the headers stay ASCII.
 func (m *SMTPMailer) SendSimpleEmail(toEmail, fromEmail, title, body string) error {
+	if err := checkAddress("to", toEmail); err != nil {
+		return err
+	}
+	if err := checkAddress("from", fromEmail); err != nil {
+		return err
+	}
+	if strings.ContainsAny(title, "\r\n") {
+		return fmt.Errorf("invalid subject: line break in a header")
+	}
 	msg := strings.Join([]string{
 		"From: " + fromEmail,
 		"To: " + toEmail,
-		"Subject: " + title,
+		"Subject: " + mime.QEncoding.Encode("utf-8", title),
 		"MIME-Version: 1.0",
 		"Content-Type: text/plain; charset=UTF-8",
 		"",
 		body,
 	}, "\r\n")
 	if err := smtp.SendMail(m.addr, nil, fromEmail, []string{toEmail}, []byte(msg)); err != nil {
-		return fmt.Errorf("send email to %s: %w", toEmail, err)
+		return fmt.Errorf("send email: %w", err)
 	}
 	return nil
 }
@@ -43,4 +56,13 @@ func (m *SMTPMailer) SendTemplatedEmail(toEmail, fromEmail, templateId string, t
 		return fmt.Errorf("encode template data of %s: %w", templateId, err)
 	}
 	return m.SendSimpleEmail(toEmail, fromEmail, templateId, string(data))
+}
+
+// checkAddress accepts a bare email address only: no display name, no line break.
+func checkAddress(field, address string) error {
+	parsed, err := mail.ParseAddress(address)
+	if err != nil || parsed.Address != address {
+		return fmt.Errorf("invalid %s address", field)
+	}
+	return nil
 }

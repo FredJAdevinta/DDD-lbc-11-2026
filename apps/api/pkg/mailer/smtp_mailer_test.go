@@ -2,9 +2,12 @@ package mailer_test
 
 import (
 	"bufio"
+	"mime"
 	"net"
+	"net/mail"
 	"strings"
 	"testing"
+	"time"
 
 	"ddd-second-hand-marketplace/pkg/mailer"
 
@@ -62,13 +65,26 @@ func smtpServer(t *testing.T) (string, <-chan string) {
 	return ln.Addr().String(), received
 }
 
+// receive waits for the message the server got, and fails the test instead
+// of hanging when none arrives.
+func receive(t *testing.T, received <-chan string) string {
+	t.Helper()
+	select {
+	case msg := <-received:
+		return msg
+	case <-time.After(2 * time.Second):
+		t.Fatal("the SMTP server received no message")
+		return ""
+	}
+}
+
 func TestSMTPMailer_SendSimpleEmail(t *testing.T) {
 	addr, received := smtpServer(t)
 
 	err := mailer.NewSMTPMailer(addr).SendSimpleEmail("bob@example.com", "shop@example.com", "Hello", "Your ad is online")
 
 	require.NoError(t, err)
-	msg := <-received
+	msg := receive(t, received)
 	assert.Contains(t, msg, "From: shop@example.com")
 	assert.Contains(t, msg, "To: bob@example.com")
 	assert.Contains(t, msg, "Subject: Hello")
@@ -81,7 +97,7 @@ func TestSMTPMailer_SendTemplatedEmail(t *testing.T) {
 	err := mailer.NewSMTPMailer(addr).SendTemplatedEmail("bob@example.com", "shop@example.com", "ad-published", map[string]any{"title": "Bike"})
 
 	require.NoError(t, err)
-	msg := <-received
+	msg := receive(t, received)
 	assert.Contains(t, msg, "Subject: ad-published")
 	assert.Contains(t, msg, `"title": "Bike"`)
 }
@@ -95,4 +111,46 @@ func TestSMTPMailer_FailsWhenServerIsUnreachable(t *testing.T) {
 	err = mailer.NewSMTPMailer(addr).SendSimpleEmail("bob@example.com", "shop@example.com", "Hello", "body")
 
 	assert.Error(t, err)
+}
+
+func TestSMTPMailer_EncodesANonASCIISubject(t *testing.T) {
+	addr, received := smtpServer(t)
+
+	err := mailer.NewSMTPMailer(addr).SendSimpleEmail("bob@example.com", "shop@example.com", "Votre annonce est publiée", "body")
+
+	require.NoError(t, err)
+	msg, err := mail.ReadMessage(strings.NewReader(receive(t, received)))
+	require.NoError(t, err)
+	raw := msg.Header.Get("Subject")
+	assert.NotContains(t, raw, "é", "a header must stay ASCII")
+	subject, err := new(mime.WordDecoder).DecodeHeader(raw)
+	require.NoError(t, err)
+	assert.Equal(t, "Votre annonce est publiée", subject)
+}
+
+func TestSMTPMailer_RefusesALineBreakInAHeader(t *testing.T) {
+	cases := map[string][3]string{
+		"subject": {"bob@example.com", "shop@example.com", "Hello\r\nBcc: eve@example.com"},
+		"to":      {"bob@example.com\r\nBcc: eve@example.com", "shop@example.com", "Hello"},
+		"from":    {"bob@example.com", "shop@example.com\nBcc: eve@example.com", "Hello"},
+	}
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			addr, received := smtpServer(t)
+
+			err := mailer.NewSMTPMailer(addr).SendSimpleEmail(c[0], c[1], c[2], "body")
+
+			assert.Error(t, err)
+			assert.Empty(t, received, "nothing must be sent")
+		})
+	}
+}
+
+func TestSMTPMailer_RefusesAnInvalidAddress(t *testing.T) {
+	addr, received := smtpServer(t)
+
+	err := mailer.NewSMTPMailer(addr).SendSimpleEmail("not an address", "shop@example.com", "Hello", "body")
+
+	assert.Error(t, err)
+	assert.Empty(t, received, "nothing must be sent")
 }
