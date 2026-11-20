@@ -35,13 +35,13 @@ The two glossaries are loaded with this file and are the only ones: [`technical.
 @documentation/glossary/domain.md
 
 - Use the glossaries' names, spelled as in the code.
-- Add a missing term to its glossary in the same change as the code that uses it; never invent one in code. Each glossary's header says how an entry is written.
+- Add a missing term to its glossary in the same change as the code that uses it, if its header says it earns an entry; otherwise reuse the names already in the code, never an English one.
 
 ## Language: French domain, English technique
 
 The team models in French, so the business vocabulary stays in French everywhere, code included. Never translate a domain term into English.
 
-- **French, from `domain.md`**: every name that carries a business concept (aggregates, value objects, commands, events, domain errors, their fields and methods, the bounded context folder, JSON keys, URL segments, frontend features), plus `domain.md` itself, the specs, the tickets and every text shown to a user.
+- **French, from `domain.md` and the existing code**: every name that carries a business concept (aggregates, value objects, commands, events, domain errors, their fields and methods, the bounded context folder, JSON keys, URL segments, frontend features), plus `domain.md` itself, the specs, the tickets and every text shown to a user.
 - **English**: the pattern words around those names (`New…`, `Err…`, `…Command`, `…Event`, `…Repository`, `…View`, `…Handler`, `…Gateway`), everything technical, comments, test descriptions, commit messages, `technical.md`, every `AGENTS.md` and the skills.
 - **ASCII in code**: drop accents, cedillas and apostrophes in identifiers, file names, URLs, JSON keys and event types. Keep them in prose and in user-facing text.
 
@@ -76,7 +76,7 @@ The team models in French, so the business vocabulary stays in French everywhere
 ## Agent docs
 
 - An `AGENTS.md` is a map plus the rules an agent would break, never an inventory of the code. A bounded context's has five sections: role, Language, Boundaries, Flows, Invariants and pitfalls.
-- Budget: 16 KiB per `AGENTS.md`, 20 KiB per glossary, 300 characters per glossary entry (`tools/docs-budget/`). A hook checks it right after an edit; `make check` and CI check it too. Over budget means compact, not split.
+- Budget: 16 KiB per `AGENTS.md`, 20 KiB per glossary, 160 characters per glossary entry (`tools/docs-budget/`). A hook checks it right after an edit; `make check` and CI check it too. Over budget means compact, not split.
 - The `docs-scribe` agent keeps these files in sync with the code.
 
 ## Pointers

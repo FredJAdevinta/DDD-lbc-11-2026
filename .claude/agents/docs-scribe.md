@@ -29,7 +29,7 @@ Agents load the glossaries in every session and read a module's `AGENTS.md` befo
 
 - **Document what exists.** Read the code; never describe an intention, propose a change or record history.
 - **Never restate the code.** No folder tree, no list of files, commands, queries, fields, endpoints or adapters: `ls` and `grep` find those.
-- **One home per fact.** A definition lives in a glossary; a module's `AGENTS.md` links to it and never repeats it.
+- **One home per fact.** A definition lives in a glossary, a rule in the module's `AGENTS.md`; neither repeats the other.
 - **Prune as much as you add.** Remove whatever became false, obvious, or redundant with a glossary or the code.
 - **Write `domain.md` in French, everything else in English**, with the names used in the code. A domain term is never translated: an `AGENTS.md` written in English still says `Annonce`.
 
@@ -37,11 +37,11 @@ Agents load the glossaries in every session and read a module's `AGENTS.md` befo
 
 1. **Read the change.** `git status` and `git diff` (staged and unstaged) for the modules concerned, then both glossaries and the affected `AGENTS.md` files.
 2. **Sort each new or changed concept**, in this order:
-   - an aggregate, a bounded context, or a business term shared by several modules or shown to users → an entry in `domain.md`; a new bounded context also gets its row in the domain map;
+   - an aggregate root, an actor or a domain event → an entry in `domain.md`; a new bounded context also gets its row in the domain map. What sits inside an aggregate (value objects, entities, statuts) and the commands and queries get none: the code names them;
    - an architecture or tooling concept several modules share → an entry in `technical.md`;
    - a term that only makes sense inside one module → the Language section of that module's `AGENTS.md`;
    - anything else → nowhere.
-3. **Write glossary entries** as each glossary's header says: `- **Term** — _tag_. One or two sentences.`, 300 characters at most, standing alone (no link to a file or a spec). A domain entry is in French: the term as the team says it, then its spelling in code in parentheses when the two differ.
+3. **Write glossary entries** as each glossary's header says, standing alone (no link to a file or a spec). An entry is one line, 160 characters at most: what the term *is* here, never its fields, validation, units or algorithms (those are code, or the module's `AGENTS.md`), nor a textbook definition an agent already knows. A `domain.md` entry is French, `- **Terme** (`NomEnCode`) — définition.`, the parentheses only when the code name differs; a `technical.md` entry is `- **Term** — definition.`
 4. **Update the module's `AGENTS.md`** with the template below.
 5. **Run the budget check** and compact until it passes:
 

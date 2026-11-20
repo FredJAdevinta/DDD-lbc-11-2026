@@ -2,8 +2,8 @@
 
 // Size budget of the agent docs. An AGENTS.md is a map plus the rules an agent
 // would break, not an inventory of the code: past a few thousand tokens agents
-// stop reading it. A glossary entry says what a term is in one or two
-// sentences; the rules of a feature belong to its module's AGENTS.md.
+// stop reading it. A glossary entry says what a term is, in one line; the
+// rules of a feature belong to its module's AGENTS.md.
 //
 // Usage:
 //   node tools/docs-budget/docs-budget.mjs [--root <path>] [file ...]
@@ -23,8 +23,8 @@ const DOC_NAME = 'AGENTS.md'
 const SKIPPED_DIRECTORIES = new Set(['.git', 'node_modules', 'dist', '.output', '.tanstack', 'worktrees'])
 
 export const GLOSSARIES = new Map([
-  ['documentation/glossary/domain.md', { bytes: 20 * 1024, entryCharacters: 300 }],
-  ['documentation/glossary/technical.md', { bytes: 20 * 1024, entryCharacters: 300 }],
+  ['documentation/glossary/domain.md', { bytes: 20 * 1024, entryCharacters: 160 }],
+  ['documentation/glossary/technical.md', { bytes: 20 * 1024, entryCharacters: 160 }],
 ])
 
 // The verdict on one AGENTS.md, `null` when it is within its budget.
@@ -141,7 +141,7 @@ async function main() {
   }
   if (violations.some(isGlossary)) {
     console.error(
-      "docs-budget: a glossary entry says what a term is, in one or two sentences; a feature's rules belong to its module's AGENTS.md",
+      "docs-budget: a glossary entry says what a term is, in one line; a feature's rules belong to its module's AGENTS.md",
     )
   }
   return 1
