@@ -41,3 +41,7 @@ window.matchMedia = (query: string) => ({
   removeEventListener: () => {},
   dispatchEvent: () => false,
 })
+
+// jsdom does not implement scrollTo; the router scrolls to the top on every
+// navigation.
+window.scrollTo = () => {}

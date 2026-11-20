@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RechercheRouteImport } from './routes/recherche'
+import { Route as AnnoncesIdRouteImport } from './routes/annonces/$id'
+import { Route as AnnoncesDeposerRouteImport } from './routes/annonces/deposer'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RechercheRoute = RechercheRouteImport.update({
+  id: '/recherche',
+  path: '/recherche',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnnoncesIdRoute = AnnoncesIdRouteImport.update({
+  id: '/annonces/$id',
+  path: '/annonces/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnnoncesDeposerRoute = AnnoncesDeposerRouteImport.update({
+  id: '/annonces/deposer',
+  path: '/annonces/deposer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/recherche': typeof RechercheRoute
+  '/annonces/$id': typeof AnnoncesIdRoute
+  '/annonces/deposer': typeof AnnoncesDeposerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/recherche': typeof RechercheRoute
+  '/annonces/$id': typeof AnnoncesIdRoute
+  '/annonces/deposer': typeof AnnoncesDeposerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/recherche': typeof RechercheRoute
+  '/annonces/$id': typeof AnnoncesIdRoute
+  '/annonces/deposer': typeof AnnoncesDeposerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/recherche' | '/annonces/$id' | '/annonces/deposer'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/recherche' | '/annonces/$id' | '/annonces/deposer'
+  id: '__root__' | '/' | '/recherche' | '/annonces/$id' | '/annonces/deposer'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  RechercheRoute: typeof RechercheRoute
+  AnnoncesIdRoute: typeof AnnoncesIdRoute
+  AnnoncesDeposerRoute: typeof AnnoncesDeposerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recherche': {
+      id: '/recherche'
+      path: '/recherche'
+      fullPath: '/recherche'
+      preLoaderRoute: typeof RechercheRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/annonces/$id': {
+      id: '/annonces/$id'
+      path: '/annonces/$id'
+      fullPath: '/annonces/$id'
+      preLoaderRoute: typeof AnnoncesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/annonces/deposer': {
+      id: '/annonces/deposer'
+      path: '/annonces/deposer'
+      fullPath: '/annonces/deposer'
+      preLoaderRoute: typeof AnnoncesDeposerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  RechercheRoute: RechercheRoute,
+  AnnoncesIdRoute: AnnoncesIdRoute,
+  AnnoncesDeposerRoute: AnnoncesDeposerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

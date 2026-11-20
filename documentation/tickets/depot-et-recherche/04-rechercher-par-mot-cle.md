@@ -4,18 +4,18 @@
 
 **Blocked by:** 02 (Consulter une annonce)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] La requête `RechercherAnnonces` ne renvoie que les annonces activées, triées par date de dépôt décroissante, 20 par page, avec le nombre total de résultats et le numéro de page.
-- [ ] Le mot-clé est cherché dans le titre et la description :
+- [x] La requête `RechercherAnnonces` ne renvoie que les annonces activées, triées par date de dépôt décroissante, 20 par page, avec le nombre total de résultats et le numéro de page.
+- [x] Le mot-clé est cherché dans le titre et la description :
   - sans tenir compte de la casse ni des accents ;
   - chaque mot saisi doit apparaître (ET logique), donc « velo electrique » trouve « Vélo Électrique » ;
   - un mot-clé vide renvoie toutes les annonces activées.
-- [ ] La recherche est testée sur le dépôt en mémoire : normalisation, ET logique, tri, pagination et exclusion des annonces non activées.
-- [ ] L'API expose la recherche en lecture, avec les critères et la page en paramètres de requête.
-- [ ] La page `/recherche` porte le mot-clé et la page dans les paramètres d'URL, validés par un schéma. Elle affiche une liste de résultats (image placeholder, titre, prix ou « Don », ville, date), le total et la pagination Spark.
-- [ ] Une recherche sans résultat affiche un message dédié.
-- [ ] La page d'accueil remplace le contrôle de santé de l'API par une barre de recherche (mot-clé) et les 20 dernières annonces. Chaque carte mène à la vue de l'annonce.
-- [ ] Les deux pages sont testées sur une gateway en mémoire.
-- [ ] Le glossaire et l'`AGENTS.md` du bounded context `annonce` sont à jour.
-- [ ] `make check` est vert.
+- [x] La recherche est testée sur le dépôt en mémoire : normalisation, ET logique, tri, pagination et exclusion des annonces non activées.
+- [x] L'API expose la recherche en lecture, avec les critères et la page en paramètres de requête.
+- [x] La page `/recherche` porte le mot-clé et la page dans les paramètres d'URL, validés par un schéma. Elle affiche une liste de résultats (image placeholder, titre, prix ou « Don », ville, date), le total et la pagination Spark.
+- [x] Une recherche sans résultat affiche un message dédié.
+- [x] La page d'accueil remplace le contrôle de santé de l'API par une barre de recherche (mot-clé) et les 20 dernières annonces. Chaque carte mène à la vue de l'annonce.
+- [x] Les deux pages sont testées sur une gateway en mémoire.
+- [x] Le glossaire et l'`AGENTS.md` du bounded context `annonce` sont à jour.
+- [x] `make check` est vert.

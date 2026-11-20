@@ -1,3 +1,4 @@
+import { Button } from '@spark-ui/components/button'
 import { useEffect, useState } from 'react'
 
 type ThemeMode = 'light' | 'dark' | 'auto'
@@ -19,15 +20,9 @@ function applyThemeMode(mode: ThemeMode) {
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
   const resolved = mode === 'auto' ? (prefersDark ? 'dark' : 'light') : mode
 
-  document.documentElement.classList.remove('light', 'dark')
-  document.documentElement.classList.add(resolved)
-
-  if (mode === 'auto') {
-    document.documentElement.removeAttribute('data-theme')
-  } else {
-    document.documentElement.setAttribute('data-theme', mode)
-  }
-
+  // Spark's themes switch on data-theme, which must always name a resolved
+  // theme: 'auto' lives only in localStorage.
+  document.documentElement.setAttribute('data-theme', resolved)
   document.documentElement.style.colorScheme = resolved
 }
 
@@ -68,14 +63,16 @@ export default function ThemeToggle() {
       : `Theme mode: ${mode}. Click to switch mode.`
 
   return (
-    <button
+    <Button
       type="button"
+      size="sm"
+      design="outlined"
+      intent="neutral"
       onClick={toggleMode}
       aria-label={label}
       title={label}
-      className="rounded-full border border-[var(--chip-line)] bg-[var(--chip-bg)] px-3 py-1.5 text-sm font-semibold text-[var(--sea-ink)] transition hover:-translate-y-0.5"
     >
       {mode === 'auto' ? 'Auto' : mode === 'dark' ? 'Dark' : 'Light'}
-    </button>
+    </Button>
   )
 }

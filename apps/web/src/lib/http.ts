@@ -1,7 +1,11 @@
+// An answer of the API other than 2xx. `champ`, when the API gives one, is
+// the JSON key of the request field at fault: a form shows the message under
+// that field.
 export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
+    public champ?: string,
   ) {
     super(message)
     this.name = 'ApiError'
@@ -16,12 +20,16 @@ const API_BASE_URL =
     ? (process.env.API_URL ?? 'http://localhost:8080')
     : '/api'
 
-async function errorMessage(response: Response): Promise<string> {
+async function apiError(response: Response): Promise<ApiError> {
   try {
-    const body = (await response.json()) as { error?: string }
-    return body.error ?? response.statusText
+    const body = (await response.json()) as { erreur?: string; champ?: string }
+    return new ApiError(
+      body.erreur ?? response.statusText,
+      response.status,
+      body.champ,
+    )
   } catch {
-    return response.statusText
+    return new ApiError(response.statusText, response.status)
   }
 }
 
@@ -31,7 +39,7 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...init?.headers },
   })
   if (!response.ok) {
-    throw new ApiError(await errorMessage(response), response.status)
+    throw await apiError(response)
   }
   if (response.status === 204) {
     return undefined as T

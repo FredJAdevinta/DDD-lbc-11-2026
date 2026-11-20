@@ -6,19 +6,48 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	annonceinmemory "ddd-second-hand-marketplace/internal/annonce/adapter/driven/inmemory"
+	annoncehttp "ddd-second-hand-marketplace/internal/annonce/adapter/driving/http"
+	annoncecommand "ddd-second-hand-marketplace/internal/annonce/application/command"
+	annoncequery "ddd-second-hand-marketplace/internal/annonce/application/query"
+	"ddd-second-hand-marketplace/pkg/eventbus"
 	"ddd-second-hand-marketplace/pkg/mailer"
 )
 
 func main() {
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 	})
 
+	// Shared infrastructure. No consumer yet: moderation will subscribe to
+	// AnnonceDeposee.
+	eventBus := eventbus.NewAsyncInMemoryEventBus()
+
+	// Bounded context: annonce.
+	annonceRepository := annonceinmemory.NewInMemoryAnnonceRepository()
+	if os.Getenv("DEMO_DATA") == "off" {
+		fmt.Println("Demo data: DEMO_DATA=off, no annonce loaded")
+	} else {
+		ids, err := loadDemoAnnonces(annonceRepository)
+		if err != nil {
+			log.Fatalf("Demo data: %v", err)
+		}
+		fmt.Printf("Demo data: %d annonces loaded (set DEMO_DATA=off to skip), e.g. http://localhost:3000/annonces/%s\n", len(ids), ids[0])
+	}
+	annoncehttp.NewHandler(
+		annoncequery.BuildConsulterAnnonceQuery(annonceRepository),
+		annoncequery.BuildRechercherAnnoncesQuery(annonceRepository),
+		annoncequery.BuildListerRegionsQuery(),
+		annoncecommand.BuildDeposerAnnonceCommand(annonceRepository, eventBus, time.Now),
+	).RegisterRoutes(mux)
+
 	fmt.Println("Server starting on http://localhost:8080")
 	fmt.Println("Health check available at http://localhost:8080/health")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
 
 // newMailer sends through the SMTP server at SMTP_ADDR (Mailcatcher in

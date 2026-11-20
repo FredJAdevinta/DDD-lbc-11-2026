@@ -1,6 +1,6 @@
 # apps/web
 
-The frontend of the marketplace: a TanStack Start app whose pages reach the API only through gateways. It starts as a shell: a layout, a home page that checks the API's health, and the helpers every feature reuses.
+The frontend of the marketplace: a TanStack Start app whose pages reach the API only through gateways. The home page shows a search bar and the latest annonces; `/recherche` lists results, `/annonces/$id` shows one, `/annonces/deposer` deposits one.
 
 ## Language
 
@@ -9,7 +9,9 @@ Shared terms: [`domain.md`](../../documentation/glossary/domain.md), [`technical
 ## Map
 
 - `src/routes/` — pages, one file per URL, each with its `*.test.tsx`. `__root.tsx` is the document shell.
-- `src/features/<feature>/` — a gateway (port), its HTTP and in-memory adapters, its queries. `health/` is the example to copy.
+- `src/features/<feature>/` — a gateway (port), its HTTP and in-memory adapters, its queries. `health/` is the smallest example (no page uses it any more), `annonce/` the full one.
+- `src/components/` — `AnnonceCard` (result grid) and `RechercheForm` (search bar: mot-clé, catégorie, lieu and ville ou code postal, plus the prix bounds with `avecPrix` on `/recherche`; it takes the `regions` its page loaded), shared by `/` and `/recherche`.
+- `src/test/annonces.ts` — `uneAnnonce` and `desAnnonces` fixtures for page tests.
 - `src/gateways.ts` — the composition root: the only file that imports adapters.
 - `src/lib/http.ts` — the only caller of `fetch`.
 - `src/hooks/form.ts`, `src/components/FormComponents.tsx` — the form hook and its fields.
@@ -35,8 +37,25 @@ pnpm format           # fix formatting and lint
 - **Tests never mock `fetch` or a module**: they pass in-memory gateways to `renderRoute`.
 - **`src/routeTree.gen.ts` is generated and committed**: never edit it by hand. `pnpm dev` and `pnpm build` rewrite it; after adding or renaming a route file without the dev server running, run `pnpm generate-routes` or the tests and the typecheck will not see the route.
 - **Two base URLs**: the browser calls `/api/...`, which the Vite proxy forwards to the API; server-side rendering calls the API directly at `API_URL` (default `http://localhost:8080`). Both live in `src/lib/http.ts` and `vite.config.ts`: a gateway only gives the API path.
+- **The API's error body is `{"erreur": "…", "champ"?: "…"}`**: `lib/http.ts` puts them in `ApiError.message` and `ApiError.champ`. A form shows an error with a `champ` under that field (`errorMap.onServer`, cleared on change), any other above its button. A gateway turns a 404 it expects into `null` (the page throws `notFound()` from its loader) rather than an error.
+- **Format prices and dates with `features/annonce/format.ts`**: prices are centimes (zero is « Don »), dates use the Paris time zone so server and browser render the same text.
 - **Imports inside `src/`** use the `#/` alias and no file extension.
+- **`renderRoute` mounts on `document`**, as the app hydrates it: mounted in a div, the `<body>` of `__root.tsx` fights Spark's portals and the first re-render loops forever.
+- **Search criteria live in the URL**: `/recherche` validates them with `rechercheSearchSchema` (unusable values dropped, never an error page) and loads through `loaderDeps`. The URL carries prix bounds in euros, `criteresDeRecherche` turns them into the centimes of `CriteresRecherche`. A new criterion is added to the schema, `CriteresRecherche`, `RechercheForm` and the HTTP gateway's query string; a changed criterion drops `page`. The lieu selector holds `region:84` or `departement:2A` and writes `region` or `departement` to the URL; `criteresDeRecherche` drops a code missing from the loaded régions, so the loader awaits `regionsQueryOptions` first.
+- **The in-memory gateway mirrors the API's search** (every word, no case or accent, catégorie, prix bounds included, région or département, exact code postal or whole normalised ville, newest first, 20 a page); its default régions are a small subset of the API's table: change both together.
 - **Devtools are skipped in tests** (`import.meta.env.MODE !== 'test'` in `__root.tsx`): keep that guard.
+
+## Design system: Spark UI
+
+leboncoin's Spark: `@spark-ui/components` (import one component per path, `@spark-ui/components/button`) and `@spark-ui/theme-utils`, both imported in `src/styles.css` with an `@source` on the components' `dist`, plus Nunito Sans from `@fontsource-variable/nunito-sans`.
+
+- **Spark resets Tailwind's palette and scales.** `text-sm`, `p-4`, `gap-2`, `gray-500`, `max-w-3xl`, `font-semibold` produce nothing. Use Spark tokens: colors `bg-main`, `text-on-surface`, `border-outline`, opacity `/dim-1`…`/dim-5`; spacing `p-lg`, `gap-md`, `mt-3xl`, sizes `sz-*`; type `text-display-1`, `text-headline-1`, `text-body-2-highlight`; borders `border-sm`; `rounded-md`, `z-sticky`. Check the built CSS when unsure.
+- **Keep the `@theme static` block for `--spacing-factor` in `styles.css`.** Every Spark size is `calc(… * var(--spacing-factor))`, and Tailwind emits only the theme variables a class uses directly: without it, paddings, gaps, radii and text sizes all collapse while colors still work.
+- **Form fields are Spark** (`FormField` + `Input`/`Textarea`/`Select` in `components/FormComponents.tsx`); a schema rule that mirrors the API must change with it (`features/annonce/schemas.ts`).
+- **Toasts**: `ToastProvider` wraps the app in `__root.tsx`; a page calls `useToastManager().add(...)`, which survives a navigation.
+- **Prefer a Spark component** (`Button`, `TextLink`, `FormField`, `Toast`…) over a hand-styled element; `Button asChild` wraps a router `Link`.
+- **Theme**: Spark switches on `<html data-theme="light|dark">`. `ThemeToggle` and the init script in `__root.tsx` always write the resolved theme there; the `auto` choice lives only in `localStorage`. Keep both in sync.
+- **pnpm peer warnings are expected**: Spark pins exact peers (`react` 19.2.4, `tailwindcss` 4.1.18) and we run newer patch or minor versions, which work; `@eslint/js` wants ESLint 10 while `@tanstack/eslint-config` runs on 9. `pnpm peers check` lists them.
 
 <!-- intent-skills:start -->
 # TanStack Intent - before using a router or Start API for the first time, run the matching command.

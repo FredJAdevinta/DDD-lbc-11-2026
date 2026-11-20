@@ -23,7 +23,12 @@ export async function renderRoute(
     context: router.options.context,
   })
 
-  const result = render(<RouterProvider router={router} />)
+  // The root route renders <html> and <body>: mount on the document, as the
+  // app hydrates it. Inside a div, React's body singleton fights the portals
+  // (Spark toasts) and any re-render loops forever.
+  const result = render(<RouterProvider router={router} />, {
+    container: document,
+  })
   await router.load()
   await waitFor(() => expect(router.state.status).toBe('idle'))
 

@@ -16,7 +16,7 @@ routes/ (pages)  ──▶  features/<feature>/queries.ts  ──▶  <Feature>G
                                                      (the app)          (the tests)
 ```
 
-`features/health/` and `routes/index.tsx` are the worked example: read them before writing a feature.
+`features/health/` is the smallest worked example; `features/annonce/` with `routes/recherche.tsx` (search params, loader, pagination) and `routes/annonces/deposer.tsx` (form) are the full ones: read them before writing a feature.
 
 ## Anatomy of a feature
 
@@ -92,7 +92,7 @@ Data a page cannot render without goes in the route `loader` (`context.queryClie
 
 ### 6. HTTP adapter
 
-Write `http-<feature>-gateway.ts` with `request<T>()` from `lib/http.ts` and register it in `createHttpGateways`. `request` throws an `ApiError` carrying the HTTP status and the API's `error` message. Paths are the API's own (`/health`): the `/api` prefix and the server-side base URL are `lib/http.ts`'s business.
+Write `http-<feature>-gateway.ts` with `request<T>()` from `lib/http.ts` and register it in `createHttpGateways`. `request` throws an `ApiError` carrying the HTTP status and the API's `erreur` message. Paths are the API's own (`/health`): the `/api` prefix and the server-side base URL are `lib/http.ts`'s business.
 
 ### 7. Verify
 

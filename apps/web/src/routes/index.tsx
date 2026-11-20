@@ -1,32 +1,65 @@
-import { useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { healthQueryOptions } from '#/features/health/queries'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import { AnnonceGrid } from '#/components/AnnonceCard'
+import { RechercheForm } from '#/components/RechercheForm'
+import {
+  rechercherAnnoncesQueryOptions,
+  regionsQueryOptions,
+} from '#/features/annonce/queries'
 
-export const Route = createFileRoute('/')({ component: Homepage })
+// The latest annonces: the first page of a recherche without criteria.
+const dernieres = {}
+
+export const Route = createFileRoute('/')({
+  loader: ({ context }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(
+        rechercherAnnoncesQueryOptions(context.gateways.annonce, dernieres),
+      ),
+      context.queryClient.ensureQueryData(
+        regionsQueryOptions(context.gateways.annonce),
+      ),
+    ]),
+  component: Homepage,
+})
 
 function Homepage() {
   const { gateways } = Route.useRouteContext()
-  const health = useQuery(healthQueryOptions(gateways.health))
+  const { data: resultat } = useSuspenseQuery(
+    rechercherAnnoncesQueryOptions(gateways.annonce, dernieres),
+  )
+  const { data: regions } = useSuspenseQuery(
+    regionsQueryOptions(gateways.annonce),
+  )
 
   return (
-    <main className="page-wrap px-4 pb-8 pt-14">
-      <section className="island-shell rise-in relative overflow-hidden rounded-[2rem] px-6 py-10 sm:px-10 sm:py-14">
-        <p className="island-kicker mb-3">Second-Hand Marketplace</p>
-        <h1 className="display-title mb-5 max-w-3xl text-4xl leading-[1.02] font-bold tracking-tight text-[var(--sea-ink)] sm:text-6xl">
-          Buy and sell second-hand items locally.
+    <main className="page-wrap flex flex-col gap-2xl px-lg pt-3xl pb-2xl">
+      <section className="flex flex-col gap-xl rounded-xl border-sm border-outline bg-surface px-xl py-2xl text-on-surface sm:px-3xl">
+        <h1 className="text-display-2 sm:text-display-1">
+          Achetez et vendez d'occasion près de chez vous.
         </h1>
-        <p className="mb-8 max-w-2xl text-base text-[var(--sea-ink-soft)] sm:text-lg">
-          Nothing is for sale yet: this is the starting point of the
-          marketplace.
-        </p>
-        <p
-          role="status"
-          className="inline-flex rounded-full border border-[var(--chip-line)] bg-[var(--chip-bg)] px-5 py-2.5 text-sm font-semibold text-[var(--sea-ink)]"
-        >
-          {health.isPending && 'Checking the API…'}
-          {health.isSuccess && 'API reachable'}
-          {health.isError && 'API unreachable'}
-        </p>
+        <RechercheForm regions={regions} />
+      </section>
+
+      <section className="flex flex-col gap-lg">
+        <div className="flex items-baseline justify-between gap-md">
+          <h2 className="text-headline-1">Dernières annonces</h2>
+          {resultat.total > resultat.annonces.length && (
+            <Link to="/recherche" className="text-body-2-highlight text-main">
+              Voir toutes les annonces
+            </Link>
+          )}
+        </div>
+        {resultat.annonces.length === 0 ? (
+          <p className="text-body-1 text-on-surface/dim-1">
+            Aucune annonce n'est en ligne pour le moment.
+          </p>
+        ) : (
+          <AnnonceGrid
+            annonces={resultat.annonces}
+            label="Dernières annonces"
+          />
+        )}
       </section>
     </main>
   )
